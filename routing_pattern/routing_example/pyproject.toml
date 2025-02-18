@@ -1,0 +1,19 @@
+[project]
+name = "routing-example"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Abdulqadir8", email = "aq98123@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "langgraph>=0.2.73",
+]
+
+[project.scripts]
+route_pattern = "routing_example.router:run_router"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
