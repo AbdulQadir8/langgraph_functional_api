@@ -1,5 +1,5 @@
 [project]
-name = "routing-example"
+name = "assistant-selector"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -9,11 +9,13 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "langchain-google-genai>=2.0.9",
-    "langgraph>=0.2.73",
+    "langgraph>=0.2.74",
+    "pydantic>=2.10.6",
+    "python-dotenv>=1.0.1",
 ]
 
 [project.scripts]
-route_pattern = "routing_example.router:run_router"
+run_selector = "assistant_selector.workflow:run_example"
 
 [build-system]
 requires = ["hatchling"]

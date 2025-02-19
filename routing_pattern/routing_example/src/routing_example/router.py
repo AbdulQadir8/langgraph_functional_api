@@ -1,50 +1,52 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Literal
 from langgraph.func import entrypoint, task
 import random
 from pydantic import BaseModel
 
 # Define our message types
-class Message(BaseModel):
-    content: str
-    task_type: Optional[str] = None
+class RouterInput(BaseModel):
+    query: str
 
 # Define our state
-class State(BaseModel):
-    messages: List[Message]
-    current_task: Optional[str] = None
-
+class RouterOutput(BaseModel):
+    query: str
+    task_type: str
+    response: str
 @task
-def handle_math(message: Message) -> Message:
+def handle_math(message: RouterInput) -> RouterOutput:
     """Handle math-related tasks."""
-    return Message(
-        content=f"Handled math task for: {message.content}",
-        task_type="math"
+    return RouterOutput(
+        query=message.query,
+        task_type= "math",
+        response= f"Handled math task for: {message.query}"
     )
 
 @task
-def handle_text(message: Message) -> Message:
+def handle_text(message: RouterInput) -> RouterOutput:
     """Handle text-related tasks."""
-    return Message(
-        content=f"Handled text task for: {message.content}",
-        task_type="text"
+    return RouterOutput(
+        query=message.query,
+        task_type= "text",
+        response= f"Handled text task for: {message.query}"
     )
 
 @task
-def handle_code(message: Message) -> Message:
+def handle_code(message: RouterInput) -> RouterOutput:
     """Handle code-related tasks."""
-    return Message(
-        content=f"Handled code task for: {message.content}",
-        task_type="code"
+    return RouterOutput(
+        query=message.query,
+        task_type= "code",
+        response= f"Handled code task for: {message.query}"
     )
 
 @task
-def route_message(message: Message) -> str:
+def route_message(message: RouterInput) -> Literal["math", "text", "code"]:
     """Route the message to appropriate handler."""
-    task_types = ["math", "text", "code"]
+    task_types: Literal["math", "text", "code"] = ["math", "text", "code"]
     return random.choice(task_types)
 
 @entrypoint()
-def workflow(input_message: str) -> Dict:
+def workflow(input_message: RouterInput) -> RouterOutput:
     """
     Main workflow that processes messages through appropriate handlers.
     
@@ -53,41 +55,30 @@ def workflow(input_message: str) -> Dict:
         
     Returns:
         Dict containing the conversation history
-    """
-    # Initialize state
-    state = State(messages=[Message(content=input_message)])
+    """    
+
+    # Get the last message
+    current_message = input_message.query
     
-    # Process up to 3 messages
-    for _ in range(3):
-        # Get the last message
-        current_message = state.messages[-1]
-        
-        # Route the message
-        task_type = route_message(current_message).result()
-        
-        # Handle the message based on the route
-        if task_type == "math":
-            response = handle_math(current_message).result()
-        elif task_type == "text":
-            response = handle_text(current_message).result()
-        else:  # code
-            response = handle_code(current_message).result()
-            
-        # Update state
-        state.messages.append(response)
+    # Route the message
+    task_type = route_message(RouterInput(query=current_message)).result()
     
-    return {
-        "messages": [msg.dict() for msg in state.messages],
-        "final_task_type": state.messages[-1].task_type
-    }
+    # Handle the message based on the route
+    if task_type == "math":
+        response = handle_math(RouterInput(query=current_message)).result()
+    elif task_type == "text":
+        response = handle_text(RouterInput(query=current_message)).result()
+    else:  # code
+        response = handle_code(RouterInput(query=current_message)).result()
+        
+
+    return response
 
 def run_router():
-    result = workflow.invoke("Hello, this is a test message!")
+    result = workflow.invoke(RouterInput(query="Hello, this is a test message!"))
     
     print("\nWorkflow Results:")
     print("-" * 50)
-    for i, msg in enumerate(result["messages"], 1):
-        print(f"Message {i}:")
-        print(f"Content: {msg['content']}")
-        print(f"Task Type: {msg['task_type']}")
-        print("-" * 30) 
+    print(f"Content: {result.response}")
+    print(f"TaskType: {result.task_type}")
+    print("-" * 30) 

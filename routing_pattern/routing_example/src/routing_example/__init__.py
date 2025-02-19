@@ -3,8 +3,8 @@ Routing example package using LangGraph's Functional API.
 """
 
 from .router import (
-    Message,
-    State,
+    RouterInput,
+    RouterOutput,
     workflow,
     handle_math,
     handle_text,
