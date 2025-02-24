@@ -1,0 +1,22 @@
+[project]
+name = "orchestrater-worker"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Abdulqadir8", email = "aq98123@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "dotenv>=0.9.9",
+    "langchain-google-genai>=2.0.10",
+    "langgraph>=0.2.74",
+]
+
+[project.scripts]
+orchestrater-worker = "orchestrater_worker:main"
+orch_dev = "orchestrater_worker.orch:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

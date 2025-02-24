@@ -38,8 +38,10 @@ def parallel_flow():
     
     # Run tasks and print results
     print("Processing tasks...\n")
+    start_time = time.time()
     results = parallel_tasks.invoke(tasks)
-    
+    end_time = time.time()
+    print(f"Time taken: {end_time - start_time} seconds")
     # Print results
     for task, result in zip(tasks, results):
         print(f"Task: {task}")
